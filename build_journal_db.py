@@ -2,26 +2,107 @@
 """
 build_journal_db.py
 ===================
-Genera journal_data.json a partir de un CSV exportado de JCR / Scimago.
+Descarga datos de revistas desde OpenAlex (API gratuita y abierta)
+y genera extension/journal_data.json listo para usar en la extensión.
 
-OPCIÓN A - JCR (Clarivate, requiere acceso institucional):
-  Exportar desde: https://jcr.clarivate.com/
-  Columnas necesarias: Journal name, Abbreviation, 2023 JIF, JIF Quartile, Category
+OpenAlex cubre más de 40.000 revistas con métricas de impacto.
+Los cuartiles se calculan a partir del ranking de citas dentro de cada área.
 
-OPCIÓN B - Scimago (GRATUITO):
-  Descargar de: https://www.scimagojr.com/journalrank.php
-  Exportar como CSV
-  Columnas: Title, Issn, SJR, H index, Total Docs, Quartile
-
-OPCIÓN C - Datos de ejemplo (para pruebas, incluidos abajo)
+Uso:
+  python3 build_journal_db.py            → descarga desde OpenAlex (recomendado)
+  python3 build_journal_db.py scimago archivo.csv  → usa un CSV local de Scimago
+  python3 build_journal_db.py jcr archivo.csv      → usa un CSV de JCR (Clarivate)
 """
 
 import json
 import csv
 import sys
 import os
+import urllib.request
+import urllib.parse
+import time
 
-OUTPUT_FILE = os.path.join(os.path.dirname(__file__), "extension", "journal_data.json")
+OPENALEX_URL = "https://api.openalex.org/sources"
+OUTPUT_FILE  = os.path.join(os.path.dirname(__file__), "extension", "journal_data.json")
+EMAIL        = "paperscore@github.com"   # requerido por OpenAlex para uso "polite"
+
+
+def fetch_openalex() -> list[dict]:
+    """
+    Descarga revistas 'core' desde la API de OpenAlex (~34.000 revistas).
+    Asigna cuartil Q1-Q4 según ranking de citedness dentro de cada área.
+    """
+    journals_raw = []
+    cursor = "*"
+
+    print("Descargando revistas desde OpenAlex (API gratuita)...")
+
+    while cursor:
+        params = urllib.parse.urlencode({
+            "filter":   "type:journal,is_core:true",
+            "per-page": 200,
+            "cursor":   cursor,
+            "select":   "id,display_name,abbreviated_title,topics,summary_stats",
+            "mailto":   EMAIL,
+        })
+        url = f"{OPENALEX_URL}?{params}"
+        req = urllib.request.Request(url, headers={"User-Agent": f"PaperScore/1.0 (mailto:{EMAIL})"})
+
+        with urllib.request.urlopen(req) as resp:
+            data = json.loads(resp.read())
+
+        results = data.get("results", [])
+        if not results:
+            break
+
+        if not journals_raw:
+            total = data["meta"]["count"]
+            print(f"  Total: {total:,} revistas")
+
+        journals_raw.extend(results)
+        print(f"  {len(journals_raw):,} descargadas...", end="\r")
+
+        cursor = data["meta"].get("next_cursor")
+        time.sleep(0.05)
+
+    print(f"\n  Descarga completa: {len(journals_raw):,} revistas")
+    return _assign_quartiles(journals_raw)
+
+
+def _assign_quartiles(raw: list[dict]) -> list[dict]:
+    """
+    Agrupa las revistas por área temática y asigna Q1-Q4 según
+    su posición relativa en citedness dentro del grupo.
+    """
+    # Agrupar por área principal (primer topic)
+    by_area: dict[str, list] = {}
+    for j in raw:
+        topics = j.get("topics") or []
+        area = topics[0]["field"]["display_name"] if topics else "General"
+        by_area.setdefault(area, []).append(j)
+
+    journals_out = []
+    for area, group in by_area.items():
+        # Ordenar por citedness descendente (campo dentro de summary_stats)
+        group.sort(key=lambda x: (x.get("summary_stats") or {}).get("2yr_mean_citedness") or 0, reverse=True)
+        n = len(group)
+        for i, j in enumerate(group):
+            pct = i / n   # 0 = mejor, 1 = peor
+            if   pct < 0.25: quartile = "Q1"
+            elif pct < 0.50: quartile = "Q2"
+            elif pct < 0.75: quartile = "Q3"
+            else:            quartile = "Q4"
+
+            citedness = (j.get("summary_stats") or {}).get("2yr_mean_citedness") or 0
+            journals_out.append({
+                "name":     j.get("display_name", "").strip(),
+                "abbr":     j.get("abbreviated_title") or j.get("display_name", "").strip(),
+                "jif":      round(citedness, 3),
+                "quartile": quartile,
+                "category": area,
+            })
+
+    return journals_out
 
 
 def parse_jcr_csv(filepath: str) -> list[dict]:
@@ -96,10 +177,10 @@ def sample_data() -> list[dict]:
 
 
 def main():
-    if len(sys.argv) == 3:
-        source = sys.argv[1]   # "jcr" o "scimago"
-        filepath = sys.argv[2]
+    tmp_file = None
 
+    if len(sys.argv) == 3:
+        source, filepath = sys.argv[1], sys.argv[2]
         if source == "jcr":
             journals = parse_jcr_csv(filepath)
         elif source == "scimago":
@@ -107,13 +188,16 @@ def main():
         else:
             print(f"Fuente desconocida: {source}. Usa 'jcr' o 'scimago'")
             sys.exit(1)
-
         print(f"Procesadas {len(journals)} revistas desde {filepath}")
+
+    elif len(sys.argv) == 1:
+        # Sin argumentos → descarga desde OpenAlex automáticamente
+        journals = fetch_openalex()
+        print(f"Procesadas {len(journals)} revistas desde OpenAlex")
+
     else:
-        print("Uso: python build_journal_db.py [jcr|scimago] <archivo.csv>")
-        print("Sin argumentos: se generan datos de muestra.\n")
-        journals = sample_data()
-        print(f"Generando {len(journals)} revistas de ejemplo...")
+        print(__doc__)
+        sys.exit(1)
 
     # Eliminar entradas vacías o sin nombre
     journals = [j for j in journals if j.get("name")]
@@ -123,6 +207,10 @@ def main():
 
     print(f"✓ Guardado en: {OUTPUT_FILE}")
     print(f"  Total: {len(journals)} revistas")
+
+    # Limpiar archivo temporal si se descargó
+    if tmp_file and os.path.exists(tmp_file):
+        os.remove(tmp_file)
 
 
 if __name__ == "__main__":

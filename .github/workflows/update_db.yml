@@ -20,20 +20,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Descargar CSV de Scimago
-        run: |
-          curl -L \
-            -H "User-Agent: Mozilla/5.0" \
-            "https://www.scimagojr.com/journalrank.php?out=xls" \
-            -o scimago_raw.csv
-          echo "Tamaño del CSV descargado:"
-          wc -l scimago_raw.csv
-
-      - name: Generar journal_data.json
-        run: python3 build_journal_db.py scimago scimago_raw.csv
-
-      - name: Eliminar CSV temporal
-        run: rm scimago_raw.csv
+      - name: Descargar datos de OpenAlex y generar journal_data.json
+        run: python3 build_journal_db.py
 
       - name: Commit si hay cambios
         run: |
