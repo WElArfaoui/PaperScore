@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Nature",
+    "abbr": "Nature",
+    "jif": 64.8,
+    "jif5y": 67.1,
+    "quartile": "Q1",
+    "category": "Multidisciplinary Sciences",
+    "rank": "1/74"
+  },
+  {
+    "name": "Science",
+    "abbr": "Science",
+    "jif": 56.9,
+    "jif5y": 59.2,
+    "quartile": "Q1",
+    "category": "Multidisciplinary Sciences",
+    "rank": "2/74"
+  },
+  {
+    "name": "The Lancet",
+    "abbr": "Lancet",
+    "jif": 98.4,
+    "jif5y": 89.5,
+    "quartile": "Q1",
+    "category": "Medicine, General & Internal",
+    "rank": "1/165"
+  },
+  {
+    "name": "New England Journal of Medicine",
+    "abbr": "N Engl J Med",
+    "jif": 158.5,
+    "jif5y": 141.2,
+    "quartile": "Q1",
+    "category": "Medicine, General & Internal",
+    "rank": "1/165"
+  },
+  {
+    "name": "JAMA",
+    "abbr": "JAMA",
+    "jif": 120.7,
+    "jif5y": 112.3,
+    "quartile": "Q1",
+    "category": "Medicine, General & Internal",
+    "rank": "2/165"
+  },
+  {
+    "name": "BMJ",
+    "abbr": "BMJ",
+    "jif": 93.6,
+    "jif5y": 85.4,
+    "quartile": "Q1",
+    "category": "Medicine, General & Internal",
+    "rank": "3/165"
+  },
+  {
+    "name": "PLOS ONE",
+    "abbr": "PLoS One",
+    "jif": 3.7,
+    "jif5y": 4.1,
+    "quartile": "Q2",
+    "category": "Multidisciplinary Sciences",
+    "rank": "18/74"
+  },
+  {
+    "name": "Bioinformatics",
+    "abbr": "Bioinformatics",
+    "jif": 5.8,
+    "jif5y": 6.2,
+    "quartile": "Q1",
+    "category": "Mathematical & Computational Biology",
+    "rank": "3/61"
+  },
+  {
+    "name": "Journal of Informetrics",
+    "abbr": "J Informetr",
+    "jif": 7.1,
+    "jif5y": 7.8,
+    "quartile": "Q1",
+    "category": "Information Science & Library Science",
+    "rank": "2/97"
+  },
+  {
+    "name": "Scientometrics",
+    "abbr": "Scientometrics",
+    "jif": 3.5,
+    "jif5y": 3.9,
+    "quartile": "Q2",
+    "category": "Information Science & Library Science",
+    "rank": "18/97"
+  }
+]

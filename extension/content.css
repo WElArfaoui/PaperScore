@@ -1,0 +1,49 @@
+/* ── PaperScore badges ── */
+
+.ps-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  font-size: 11px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* En Scopus a veces conviene mostrarlo en bloque */
+.ps-badge.ps-inline {
+  display: inline-flex;
+  margin-top: 2px;
+}
+
+/* Badge de Factor de Impacto */
+.ps-if {
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+.ps-if-high { background: #1a7f37; }  /* IF ≥ 10  */
+.ps-if-mid  { background: #d4a017; }  /* IF 5-9.9 */
+.ps-if-low  { background: #6e7681; }  /* IF < 5   */
+
+/* Badge de Cuartil */
+.ps-q {
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Sin información */
+.ps-unknown {
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: #e0e0e0;
+  color: #888;
+  font-size: 10px;
+  white-space: nowrap;
+}

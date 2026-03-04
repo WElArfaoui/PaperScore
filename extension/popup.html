@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>PaperScore</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>PaperScore</h1>
+  <p class="subtitle">Filtra por métricas de revista</p>
+
+  <section>
+    <label>Factor de Impacto mínimo</label>
+    <input type="number" id="minIF" placeholder="ej: 5" min="0" step="0.1">
+  </section>
+
+  <section>
+    <label>Factor de Impacto máximo</label>
+    <input type="number" id="maxIF" placeholder="ej: 100" min="0" step="0.1">
+  </section>
+
+  <section>
+    <label>Cuartil JCR</label>
+    <div class="quartile-grid">
+      <label class="q-btn q1"><input type="checkbox" value="Q1"> Q1</label>
+      <label class="q-btn q2"><input type="checkbox" value="Q2"> Q2</label>
+      <label class="q-btn q3"><input type="checkbox" value="Q3"> Q3</label>
+      <label class="q-btn q4"><input type="checkbox" value="Q4"> Q4</label>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button id="btnApply">Aplicar filtros</button>
+    <button id="btnClear" class="secondary">Limpiar</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

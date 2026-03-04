@@ -5,7 +5,8 @@
   "description": "Muestra Factor de Impacto y Cuartil JCR en PubMed, Scopus y Google Scholar",
   "permissions": [
     "storage",
-    "activeTab"
+    "activeTab",
+    "tabs"
   ],
   "host_permissions": [
     "*://pubmed.ncbi.nlm.nih.gov/*",
