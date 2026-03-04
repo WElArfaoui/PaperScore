@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "PaperScore - Métricas de Revistas",
+  "version": "1.0.0",
+  "description": "Muestra Factor de Impacto y Cuartil JCR en PubMed, Scopus y Google Scholar",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://pubmed.ncbi.nlm.nih.gov/*",
+    "*://*.scopus.com/*",
+    "*://scholar.google.com/*",
+    "*://scholar.google.es/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://pubmed.ncbi.nlm.nih.gov/*",
+        "*://*.scopus.com/*",
+        "*://scholar.google.com/*",
+        "*://scholar.google.es/*"
+      ],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["journal_data.json"],
+      "matches": [
+        "*://pubmed.ncbi.nlm.nih.gov/*",
+        "*://*.scopus.com/*",
+        "*://scholar.google.com/*",
+        "*://scholar.google.es/*"
+      ]
+    }
+  ]
+}
